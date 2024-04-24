@@ -1,5 +1,5 @@
 import { hash, compare } from 'bcryptjs';
-import { IAuthDocument } from '@auth/interfaces/auth.interfaces';
+import { IAuthDocument } from '@auth/interfaces/auth.interface';
 import { model, Model, Schema } from 'mongoose';
 
 const SALT_ROUND = 10;
@@ -11,9 +11,7 @@ const authSchema: Schema = new Schema(
     email: { type: String },
     password: { type: String },
     avatarColor: { type: String },
-    createdAt: { type: Date, default: Date.now },
-    passwordResetToken: { type: String, default: '' },
-    passwordResetExpires: { type: Number }
+    createdAt: { type: Date, default: Date.now }
   },
   {
     toJSON: {
