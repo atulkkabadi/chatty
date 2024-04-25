@@ -7,7 +7,7 @@ import { signupSchema } from '@auth/schemes/signup';
 import { IAuthDocument, ISignUpData } from '@auth/interfaces/auth.interface';
 import { authService } from '@service/db/auth.service';
 import { BadRequestError } from '@global/helpers/error-handler';
-import { Helpers } from '@root/shared/helpers/helpers';
+import { Helpers } from '@global/helpers/helpers';
 import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
 import { uploads } from '@global/helpers/cloudinary-uploads';
 import { IUserDocument } from '@user/interfaces/user.interface';

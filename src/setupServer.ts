@@ -1,3 +1,4 @@
+import { createAdapter } from 'socket.io-redis-adapter';
 import { Application, json, urlencoded, Response, Request, NextFunction } from 'express';
 import http from 'http';
 import cors from 'cors';
@@ -8,7 +9,6 @@ import cookieSession from 'cookie-session';
 import HTTP_STATUS from 'http-status-codes';
 import { Server } from 'socket.io';
 import { createClient } from 'redis';
-import { createAdapter } from 'socket.io-redis-adapter';
 import Logger from 'bunyan';
 import 'express-async-errors';
 import { config } from '@root/config';
