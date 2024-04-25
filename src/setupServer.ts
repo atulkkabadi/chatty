@@ -13,11 +13,14 @@ import Logger from 'bunyan';
 import 'express-async-errors';
 import { config } from '@root/config';
 import applicationRoutes from '@root/routes';
-import { CustomError, IErrorResponse } from './shared/globals/helpers/error-handler';
-const SERVER_PORT = 5006;
+import { CustomError, IErrorResponse } from '@global/helpers/error-handler';
+
+const SERVER_PORT = 5000;
 const log: Logger = config.createLogger('server');
+
 export class ChattyServer {
   private app: Application;
+
   constructor(app: Application) {
     this.app = app;
   }
@@ -25,16 +28,17 @@ export class ChattyServer {
   public start(): void {
     this.securityMiddleware(this.app);
     this.standardMiddleware(this.app);
-    this.routeMiddleware(this.app);
+    this.routesMiddleware(this.app);
     this.globalErrorHandler(this.app);
     this.startServer(this.app);
   }
+
   private securityMiddleware(app: Application): void {
     app.use(
       cookieSession({
         name: 'session',
         keys: [config.SECRET_KEY_ONE!, config.SECRET_KEY_TWO!],
-        maxAge: 24 * 7 * 3600000,
+        maxAge: 5000,
         secure: config.NODE_ENV !== 'development'
       })
     );
@@ -42,25 +46,29 @@ export class ChattyServer {
     app.use(helmet());
     app.use(
       cors({
-        origin: '*',
+        origin: config.CLIENT_URL,
         credentials: true,
         optionsSuccessStatus: 200,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
       })
     );
   }
+
   private standardMiddleware(app: Application): void {
-    app.use(compression);
+    app.use(compression());
     app.use(json({ limit: '50mb' }));
     app.use(urlencoded({ extended: true, limit: '50mb' }));
   }
-  private routeMiddleware(app: Application): void {
+
+  private routesMiddleware(app: Application): void {
     applicationRoutes(app);
   }
+
   private globalErrorHandler(app: Application): void {
     app.all('*', (req: Request, res: Response) => {
       res.status(HTTP_STATUS.NOT_FOUND).json({ message: `${req.originalUrl} not found` });
     });
+
     app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
       log.error(error);
       if (error instanceof CustomError) {
@@ -69,6 +77,7 @@ export class ChattyServer {
       next();
     });
   }
+
   private async startServer(app: Application): Promise<void> {
     try {
       const httpServer: http.Server = new http.Server(app);
@@ -79,6 +88,7 @@ export class ChattyServer {
       log.error(error);
     }
   }
+
   private async createSocketIO(httpServer: http.Server): Promise<Server> {
     const io: Server = new Server(httpServer, {
       cors: {
@@ -100,7 +110,8 @@ export class ChattyServer {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private socketIOConnections(io: Server): void {
-    log.info('socketIOConnections')
+    log.info('socketIOConnections');
   }
 }
